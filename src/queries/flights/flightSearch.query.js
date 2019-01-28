@@ -11,8 +11,32 @@ export const flightSearchQ = gql`
         id
         userName
       }
+      returnRides {
+        departureTime
+        arrivalTime
+        duration
+        origin {
+          lat
+          lng
+          name
+          airportCode
+        }
+        destination {
+          lat
+          lng
+          name
+          airportCode
+        }
+        company {
+          name
+          iata
+        }
+      }
       rides {
         name
+        departureTime
+        arrivalTime
+        duration
         origin {
           lat
           lng

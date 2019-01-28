@@ -8,10 +8,29 @@ import {
   withStyles,
   Grid
 } from "@material-ui/core"
+import styled from "styled-components"
 //
-import AirlinePhoto from "./AirlinePhoto"
+import AirlineImage from "./AirlineImgSimple.jsx"
 import RideLine from "./RideLine"
+import TotalLine from "./TotalLine"
+import LayoverLine from "./LayoverLine"
 import { showMe } from "../../helpers/showMe"
+
+const RidesGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(5, max-content) 1fr;
+  column-gap: 3px;
+  align-items: center;
+  justify-items: start;
+`
+
+const FlightDetailsGrid = styled.div`
+  display: grid;
+  grid-template-areas:
+    "names names price"
+    "logo  rides rides";
+  column-gap: 1rem;
+`
 
 const styles = {
   card: {
@@ -22,55 +41,61 @@ const styles = {
     margin: "0 2px",
     transform: "scale(0.8)"
   },
-  title: {
-    fontSize: 14
+  names: {
+    fontSize: 14,
+    gridArea: "names"
   },
-  pos: {
-    marginBottom: 12
+  price: {
+    gridArea: "price",
+    justifySelf: "end"
+  },
+  logo: {
+    gridArea: "logo"
+  },
+  rides: {
+    gridArea: "rides"
   }
 }
-
+function formatName({ firstName, lastName, userName }, i, travelerCount) {
+  let response = ""
+  if (i > 0) response += ", "
+  if (firstName) response += firstName + " "
+  // if more than one traveler, only show first letter of last name
+  if (lastName) response += travelerCount > 1 ? lastName.charAt(0) : lastName
+  if (!firstName && !lastName) response += userName
+  return response
+}
 export class FlightCard extends Component {
   render() {
     const { classes, flight } = this.props
     const { travelers, price, rides } = flight
-
-    const bull = <span className={classes.bullet}>•</span>
     return (
       <Card className={classes.card}>
         <CardContent>
-          <Grid container>
-            <Grid item xs={12}>
-              <Typography
-                className={classes.title}
-                color="textSecondary"
-                gutterBottom
-              >
-                {travelers.map((t, i) => (i ? ", " + t.userName : t.userName))}
-              </Typography>
-            </Grid>
-            <Grid item xs={2}>
-              <AirlinePhoto rides={rides} />
-            </Grid>
-            <Grid item xs={8}>
-              {rides.map(ride => (
-                <RideLine ride={ride} />
+          <FlightDetailsGrid>
+            <Typography
+              className={classes.names}
+              color="textSecondary"
+              gutterBottom
+            >
+              {travelers.map((t, i) => formatName(t, i, travelers.length))}
+            </Typography>
+            <Typography variant="button" className={classes.price}>
+              <span>$</span>
+              {price}
+            </Typography>
+            <AirlineImage className={classes.logo} rides={rides} size="50px" />
+            <RidesGrid className={classes.rides}>
+              {rides.map((ride, i) => (
+                <>
+                  <LayoverLine ride={ride} prevRide={rides[i - 1]} />
+                  <RideLine ride={ride} />
+                </>
               ))}
-            </Grid>
-            <Grid item xs={2}>
-              totals
-            </Grid>
-          </Grid>
-
-          <Typography className={classes.pos} color="textSecondary">
-            adjective
-          </Typography>
-          <Typography component="p">
-            well meaning and kindly.
-            <br />
-            {'"a benevolent smile"'}
-          </Typography>
-          {showMe(flight)}
+              <TotalLine rides={rides} />
+            </RidesGrid>
+          </FlightDetailsGrid>
+          {/* {showMe(flight)} */}
         </CardContent>
         <CardActions>
           <Button size="small">Learn More</Button>

@@ -12,6 +12,7 @@ import {
   fakeFSResponse,
   fakeUserIds
 } from "../helpers/fakeFlightSearchResponse"
+import FlightChart from "../components/FlightChart.jsx"
 export class TestCalls extends Component {
   state = {
     input: null,
@@ -35,7 +36,7 @@ export class TestCalls extends Component {
     return (
       <div>
         <Grid container>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={3}>
             <FlightSearchForm onSubmit={this.onSubmit} />
           </Grid>
           <Query
@@ -48,34 +49,38 @@ export class TestCalls extends Component {
               if (error) return <p>ERROR!! {error.message}</p>
               data = this.state.fakeResponse ? fakeFSResponse : data
               return (
-                <Grid container item xs={12} md={8}>
-                  {this.state.fakeResponse && <h3>Fake Results</h3>}
-                  {data && (
-                    <div>
-                      {data.flightSearch && (
-                        <>
-                          <Grid container item xs={12} spacing={8}>
-                            {data.flightSearch.map(flight => (
-                              <Grid item xs={6}>
-                                <FlightCard flight={flight} />
-                              </Grid>
-                            ))}
-                          </Grid>
-                          <Grid item xs={12}>
-                            <h3>All data</h3>
-                            {showMe(data)}
-                          </Grid>
-                        </>
-                      )}
-                    </div>
+                <>
+                  <Grid container item xs={12} md={9}>
+                    {data && (
+                      <div>
+                        {data.flightSearch && (
+                          <>
+                            <Grid container item xs={12} spacing={8}>
+                              {/* {data.flightSearch.map(flight => (
+                                <Grid item xs={6}>
+                                  <FlightCard flight={flight} />
+                                </Grid>
+                              ))} */}
+                              <FlightChart flights={data.flightSearch} />
+                            </Grid>
+                          </>
+                        )}
+                      </div>
+                    )}
+                  </Grid>
+                  {!this.state.fakeResponse && (
+                    <Grid container>
+                      <Grid item xs={12}>
+                        <h3>All data</h3>
+                        {showMe(data)}
+                      </Grid>
+                    </Grid>
                   )}
-                </Grid>
+                </>
               )
             }}
           </Query>
         </Grid>
-
-        <pre>{this.state.results}</pre>
       </div>
     )
   }

@@ -5,6 +5,8 @@ import App from "./pages/App"
 import ApolloClient from "apollo-boost"
 import { ApolloProvider } from "react-apollo"
 import { MuiPickersUtilsProvider } from "material-ui-pickers"
+import { MuiThemeProvider } from "@material-ui/core"
+import { MuiTheme } from "./paperbase/paperbaseTheme"
 import DateFnsUtils from "@date-io/date-fns"
 const client = new ApolloClient({
   uri: process.env.REACT_APP_GRAPHQL_URL
@@ -12,9 +14,11 @@ const client = new ApolloClient({
 
 const TripSyncApp = () => (
   <ApolloProvider client={client}>
-    <MuiPickersUtilsProvider utils={DateFnsUtils}>
-      <App />
-    </MuiPickersUtilsProvider>
+    <MuiThemeProvider theme={MuiTheme}>
+      <MuiPickersUtilsProvider utils={DateFnsUtils}>
+        <App />
+      </MuiPickersUtilsProvider>
+    </MuiThemeProvider>
   </ApolloProvider>
 )
 
