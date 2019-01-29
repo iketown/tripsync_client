@@ -18,6 +18,7 @@
     "moment": "2.24.0",
     "prop-types": "latest",
     "react": "latest",
+    "react-adopt": "0.6.0",
     "react-apollo": "2.4.0",
     "react-chartjs-2": "2.7.4",
     "react-dom": "latest",

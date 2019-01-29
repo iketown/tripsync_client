@@ -19,7 +19,11 @@ function FlightSearchForm({ onSubmit }) {
   const initialValues = {
     departDate: addDays(new Date(), 7),
     returnDate: addDays(new Date(), 14),
-    oneWay: "roundTrip"
+    oneWay: "roundTrip",
+    origin1: "msp",
+    origin2: "ord",
+    // origin3: "sea",
+    destination: "lax"
   }
   return (
     <Form onSubmit={onSubmit} initialValues={initialValues}>
@@ -28,20 +32,46 @@ function FlightSearchForm({ onSubmit }) {
           <form onSubmit={handleSubmit}>
             {showMe(values)}
             <Grid container>
-              <Grid item xs={12}>
-                <TextInput
-                  label="From"
-                  name="origin"
-                  placeholder="Departure airport"
-                />
+              <Grid item container xs={6}>
+                <Grid item xs={12}>
+                  <TextInput
+                    label="From"
+                    name="origin1"
+                    placeholder="Departure airport"
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextInput
+                    label="From"
+                    name="origin2"
+                    placeholder="Departure airport 2"
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextInput
+                    label="From"
+                    name="origin3"
+                    placeholder="Departure airport 3"
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextInput
+                    label="From"
+                    name="origin4"
+                    placeholder="Departure airport 3"
+                  />
+                </Grid>
               </Grid>
-              <Grid item xs={12}>
-                <TextInput
-                  label="To"
-                  name="destination"
-                  placeholder="Arrival airport"
-                />
+              <Grid item container xs={6}>
+                <Grid item xs={12}>
+                  <TextInput
+                    label="To"
+                    name="destination"
+                    placeholder="Arrival airport"
+                  />
+                </Grid>
               </Grid>
+
               <Grid item xs={12}>
                 <Field name="departDate">
                   {({ input, meta }) => (

@@ -1,6 +1,7 @@
 import React, { Component } from "react"
 import { Grid, Button } from "@material-ui/core"
-import { Query } from "react-apollo"
+import { Query, compose } from "react-apollo"
+import gql from "graphql-tag"
 //
 import FlightSearchForm from "../forms/FlightSearchForm.jsx"
 import { flightSearchQ } from "../queries/flights/flightSearch.query"
@@ -16,15 +17,51 @@ import FlightChart from "../components/FlightChart.jsx"
 export class TestCalls extends Component {
   state = {
     input: null,
-    fakeResponse: true
+    fakeResponse: false,
+    ready: false,
+    query: gql`
+      {
+        whatever {
+          what
+        }
+      }
+    `,
+    variables: {
+      input1: {
+        origin: "MSP",
+        destination: "MCO",
+        departDate: "1549391294510",
+        returnDate: "1549996113474",
+        travelerIds: ["5c4d999074860b172de01adf"]
+      },
+      input2: {
+        origin: "LAX",
+        destination: "MCO",
+        departDate: "1549391294510",
+        returnDate: "1549996113474",
+        travelerIds: ["5c4cbdc01f1be00dce856bdd", "5c4d99aa74860b172de01ae0"]
+      }
+    }
   }
   onSubmit = values => {
-    const { origin, destination, departDate, returnDate, oneWay } = values
-    console.log(origin, destination, departDate, returnDate, oneWay)
+    const {
+      origin1,
+      origin2,
+      origin3,
+      origin4,
+      destination,
+      departDate,
+      returnDate,
+      oneWay
+    } = values
     const departDateFormatted = Number(getTime(departDate)).toString()
     const returnDateFormatted = Number(getTime(returnDate)).toString()
+    // [(origin1, origin2, origin3, origin4)].map(origin => {
+    //   // create query string from each
+    // })
+    console.log(origin, destination, departDate, returnDate, oneWay)
     const input = {
-      origin,
+      origin: origin1,
       destination,
       departDate: departDateFormatted,
       returnDate: oneWay === "roundTrip" ? returnDateFormatted : null,
@@ -40,9 +77,9 @@ export class TestCalls extends Component {
             <FlightSearchForm onSubmit={this.onSubmit} />
           </Grid>
           <Query
-            query={flightSearchQ}
-            variables={{ input: this.state.input }}
-            skip={!this.state.input}
+            query={this.state.query}
+            variables={this.state.variables}
+            // skip={!this.state.ready}
           >
             {({ loading, error, data }) => {
               if (loading) return <p>loading...</p>
@@ -51,7 +88,7 @@ export class TestCalls extends Component {
               return (
                 <>
                   <Grid container item xs={12} md={9}>
-                    {data && (
+                    {false && (
                       <div>
                         {data.flightSearch && (
                           <>
@@ -61,7 +98,18 @@ export class TestCalls extends Component {
                                   <FlightCard flight={flight} />
                                 </Grid>
                               ))} */}
-                              <FlightChart flights={data.flightSearch} />
+                              <Grid item xs={6}>
+                                <FlightChart
+                                  flights={data.flightSearch}
+                                  returnTripBool={false}
+                                />
+                              </Grid>
+                              <Grid item xs={6}>
+                                <FlightChart
+                                  flights={data.flightSearch}
+                                  returnTripBool={true}
+                                />
+                              </Grid>
                             </Grid>
                           </>
                         )}
