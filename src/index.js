@@ -8,8 +8,12 @@ import { MuiPickersUtilsProvider } from "material-ui-pickers"
 import { MuiThemeProvider } from "@material-ui/core"
 import { MuiTheme } from "./paperbase/paperbaseTheme"
 import DateFnsUtils from "@date-io/date-fns"
+import "./styles.css"
+const headers = { authorization: localStorage.getItem("auth-token") || "" }
+
 const client = new ApolloClient({
-  uri: process.env.REACT_APP_GRAPHQL_URL
+  uri: process.env.REACT_APP_GRAPHQL_URL,
+  request: operation => operation.setContext({ headers })
 })
 
 const TripSyncApp = () => (
