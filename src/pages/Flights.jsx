@@ -1,6 +1,7 @@
 import React, { Component } from "react"
 import { Grid } from "@material-ui/core"
 import FlightSearchForm from "../forms/FlightSearchForm"
+import MapDisplay from "../components/MapDisplay.jsx"
 export class Flights extends Component {
   render() {
     return (
@@ -9,7 +10,7 @@ export class Flights extends Component {
           <FlightSearchForm />
         </Grid>
         <Grid item xs={12} md={4}>
-          MAP
+          <MapDisplay />
         </Grid>
       </Grid>
     )

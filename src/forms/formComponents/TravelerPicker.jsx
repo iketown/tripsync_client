@@ -7,6 +7,14 @@ import {
   Avatar,
   Divider
 } from "@material-ui/core"
+import { Mutation } from "react-apollo"
+import gql from "graphql-tag"
+
+const ADD_TRAVELER_MUT = gql`
+  mutation addTraveler($userId: ID!, $airportCode: String) {
+    addTraveler(userId: $userId, airportCode: $airportCode) @client
+  }
+`
 
 function TravelerPicker({
   travelers,
@@ -17,35 +25,49 @@ function TravelerPicker({
   adminLocs
 }) {
   if (!travelers) return null
-  console.log("added travs", addedTravs)
   return (
-    <Menu
-      PaperProps={{ style: {} }}
-      onClose={onClose}
-      anchorEl={anchorEl}
-      open={!!anchorEl}
-    >
+    <Menu onClose={onClose} anchorEl={anchorEl} open={!!anchorEl}>
       {travelers
+        // only show travelers who arent already in the list
         .filter(trav => !addedTravs[trav.id])
         .map(trav => {
           const fullName = `${trav.firstName} ${trav.lastName}`
-          const airport =
+          const airportCode =
             trav.homeAirports && trav.homeAirports.length
               ? trav.homeAirports[0].airportCode
               : ""
+          const homeAirport =
+            trav.homeAirports && trav.homeAirports.length
+              ? trav.homeAirports[0]
+              : {}
           return (
-            <MenuItem
-              key={trav.id}
-              onClick={() => {
-                addTraveler({ userId: trav.id, airport })
-                onClose()
+            <Mutation key={trav.id} mutation={ADD_TRAVELER_MUT}>
+              {addTravelerApollo => {
+                return (
+                  <MenuItem
+                    onClick={() => {
+                      addTraveler({ userId: trav.id, airportCode })
+                      addTravelerApollo({
+                        variables: {
+                          userId: trav.id,
+                          airportCode
+                        }
+                      })
+                      onClose()
+                    }}
+                  >
+                    <ListItemAvatar>
+                      <Avatar src={trav.photoUrl} alt={fullName} />
+                    </ListItemAvatar>
+                    <ListItemText
+                      primary={fullName}
+                      secondary={airportCode}
+                      inset
+                    />
+                  </MenuItem>
+                )
               }}
-            >
-              <ListItemAvatar>
-                <Avatar src={trav.photoUrl} alt={fullName} />
-              </ListItemAvatar>
-              <ListItemText primary={fullName} secondary={airport} inset />
-            </MenuItem>
+            </Mutation>
           )
         })}
       <Divider />

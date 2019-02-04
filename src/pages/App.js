@@ -6,9 +6,9 @@ import NavBar from "../components/NavBar"
 //
 import Flights from "./Flights.jsx"
 import TestCalls from "./TestCalls"
-import TestCalls3 from "./TestCalls3.jsx"
 import Home from "./index"
 import Tests2 from "./Tests2"
+import MyTravelers from "./MyTravelers"
 
 const Container = styled.div`
   margin: 8px;
@@ -23,7 +23,7 @@ const Container = styled.div`
 `
 
 export class App extends Component {
-  state = { showGrid: true }
+  state = { showGrid: false }
   handleGridToggle = () => {
     this.setState({ showGrid: !this.state.showGrid })
   }
@@ -39,7 +39,8 @@ export class App extends Component {
             <Route path="/amadeus" component={TestCalls} />
             <Route path="/test2" component={Tests2} />
             <Route path="/flights" component={Flights} />
-            <Route path="/" component={Home} />
+            <Route path="/travelers" component={MyTravelers} />
+            <Route path="/" exact component={Home} />
           </Container>
         </>
       </Router>

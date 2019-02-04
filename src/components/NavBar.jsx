@@ -130,6 +130,12 @@ class ButtonAppBar extends Component {
                     text="My Trips"
                     handleCloseMenu={this.handleCloseMenu}
                   />
+                  <LinkMenuItem
+                    to="/travelers"
+                    icon={<People />}
+                    text="My Travelers"
+                    handleCloseMenu={this.handleCloseMenu}
+                  />
                 </Menu>
               </div>
             )}
