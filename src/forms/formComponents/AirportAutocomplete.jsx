@@ -1,8 +1,16 @@
 import React, { useState } from "react"
 import { Query } from "react-apollo"
 import { airportAutocompleteQ } from "../../queries/flights/airportAutocomplete.query"
-import { TextField, MenuItem, ListItemText, Menu } from "@material-ui/core"
+import {
+  TextField,
+  MenuItem,
+  ListItemText,
+  Menu,
+  InputAdornment,
+  IconButton
+} from "@material-ui/core"
 import Autocomplete from "react-autocomplete"
+import { AddCircleOutline } from "@material-ui/icons"
 //
 function AirportAutocomplete({ label, handleSelectedAirport }) {
   const [searchText, setSearchText] = useState("")
@@ -20,6 +28,18 @@ function AirportAutocomplete({ label, handleSelectedAirport }) {
         return (
           <>
             <Autocomplete
+              menuStyle={{
+                borderRadius: "3px",
+                boxShadow: "0 2px 12px rgba(0, 0, 0, 0.1)",
+                background: "rgba(255, 255, 255, 0.9)",
+                padding: "2px 0",
+                fontSize: "90%",
+                position: "fixed",
+                overflow: "auto",
+                maxHeight: "50%", // TODO: don't cheat, let it flow to the bottom
+                zIndex: 2,
+                display: searchText ? "inherit" : "none"
+              }}
               getItemValue={ap => ap.airportCode}
               items={
                 (data &&
@@ -49,7 +69,7 @@ function AirportAutocomplete({ label, handleSelectedAirport }) {
               }}
               onSelect={(val, item) => {
                 setChosenAirport(item)
-                handleSelectedAirport(item)
+                // handleSelectedAirport(item)
                 setSearchText(val)
               }}
               renderInput={props => {
@@ -66,6 +86,21 @@ function AirportAutocomplete({ label, handleSelectedAirport }) {
                         .replace("International", "Int.")
                         .slice(0, 30)
                     }
+                    InputProps={{
+                      endAdornment: chosenAirport && chosenAirport.airportCode && (
+                        <InputAdornment position="end">
+                          <IconButton
+                            onClick={() => {
+                              handleSelectedAirport(chosenAirport)
+                              setChosenAirport(null)
+                              setSearchText("")
+                            }}
+                          >
+                            <AddCircleOutline color="primary" />
+                          </IconButton>
+                        </InputAdornment>
+                      )
+                    }}
                   />
                 )
               }}

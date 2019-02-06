@@ -14,6 +14,7 @@ export const Panel = ({
   icon,
   title,
   mainContent,
+  summaryLine,
   expanded,
   handleChange,
   classes = {}
@@ -24,13 +25,21 @@ export const Panel = ({
       onChange={handleChange(title)}
     >
       <ExpansionPanelSummary expandIcon={<ExpandMore />}>
-        <div className={classes.icon}>{icon}</div>
-        <Typography className={classes.heading}>{title}</Typography>
-        {/* <Typography className={classes.secondaryHeading}>
-          I am an expansion panel
-        </Typography> */}
+        <div className={classes.topPanel}>
+          <div className={classes.iconAndTitle}>
+            <span className={classes.icon}>{icon}</span>
+            <Typography component="span" className={classes.heading}>
+              {title}
+            </Typography>
+          </div>
+          {summaryLine && (
+            <Typography className={classes.secondaryHeading}>
+              {summaryLine}
+            </Typography>
+          )}
+        </div>
       </ExpansionPanelSummary>
-      <ExpansionPanelDetails>{mainContent}</ExpansionPanelDetails>
+      <ExpansionPanelDetails>{mainContent} </ExpansionPanelDetails>
     </ExpansionPanel>
   )
 }
@@ -44,17 +53,29 @@ const accordionStyles = theme => ({
     width: "100%",
     border: "1px green solid"
   },
+  topPanel: {
+    justifyContent: "space-between",
+    display: "flex",
+    width: "100%",
+    alignItems: "center"
+  },
   icon: {
     flexBasis: "10%",
     flexShrink: 0
   },
   heading: {
-    fontSize: theme.typography.pxToRem(15)
+    fontSize: theme.typography.pxToRem(15),
+    display: "inline-block",
+    marginLeft: "1rem"
+  },
+  iconAndTitle: {
+    display: "flex",
+    alignItems: "center"
+  },
+  secondaryHeading: {
+    fontSize: theme.typography.pxToRem(15),
+    color: theme.palette.text.secondary
   }
-  //   secondaryHeading: {
-  //     fontSize: theme.typography.pxToRem(15),
-  //     color: theme.palette.text.secondary
-  //   }
 })
 
 export default withStyles(accordionStyles)(Panel)

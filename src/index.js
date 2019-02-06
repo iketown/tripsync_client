@@ -13,7 +13,10 @@ import { defaults } from "./pages/resolvers/defaults"
 import { resolvers } from "./pages/resolvers/resolvers"
 import { typeDefs } from "./pages/resolvers/schema"
 
-const headers = { authorization: localStorage.getItem("auth-token") || "" }
+const headers = {
+  authorization: localStorage.getItem("auth-token") || "",
+  refresh: localStorage.getItem("refresh-token") || ""
+}
 const client = new ApolloClient({
   uri: process.env.REACT_APP_GRAPHQL_URL,
   request: operation => operation.setContext({ headers }),

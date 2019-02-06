@@ -45,6 +45,16 @@ export const myTravelersQ = gql`
   }
 `
 
+export const MyTravelersIds = gql`
+  query MY_TRAVELERS_IDS {
+    myTravelerIds: me {
+      adminTravelers {
+        id
+      }
+    }
+  }
+`
+
 export const MyTravelersFullQ = gql`
   query MY_TRAVELERS_FULL_Q {
     me {

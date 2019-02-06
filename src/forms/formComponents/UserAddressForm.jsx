@@ -6,49 +6,56 @@ import { Mutation, Query } from "react-apollo"
 import TextInput from "../../components/ui/TextInput.jsx"
 import AddressAutocomplete from "./AddressAutocomplete.jsx"
 import { showMe } from "../../helpers/showMe"
-import { UpdateUserMutation } from "../../queries/user.queries.js"
+import {
+  UpdateUserMutation,
+  UserFreqAirportQ
+} from "../../queries/user.queries.js"
 
 //
 //
 function UserAddressForm({ trav }) {
-  const { homeAirports, memberships, id, photoUrl, ...initialValues } = trav
-  const addressInfo = initialValues.homeAddress
-  initialValues.homeAddress = addressInfo.street
+  const {
+    freqAirports,
+    homeAirports,
+    memberships,
+    id,
+    photoUrl,
+    __typename,
+    ...initialValues
+  } = trav
 
   return (
     <Mutation mutation={UpdateUserMutation}>
       {(mutate, { loading, error, data }) => {
-        console.log("data in mutation", data)
         const handleSubmit = values => {
-          console.log("values", values)
           const { homeAddress, ...userInfo } = values
+          const { __typename, ...homeAddressStripped } = homeAddress
           const variables = {
             input: userInfo,
-            homeAddressInput: homeAddress,
+            homeAddressInput: homeAddressStripped,
             userId: trav.id
           }
-          console.log("variables", variables)
-          mutate({ variables })
+          mutate({
+            variables,
+            refetchQueries: {
+              query: UserFreqAirportQ,
+              variables: { userId: id }
+            }
+          })
         }
         return (
           <Form onSubmit={handleSubmit} initialValues={initialValues}>
-            {({ values, handleSubmit }) => {
+            {({ values, handleSubmit, pristine, dirty, form }) => {
               return (
                 <form style={{ width: "100%" }} onSubmit={handleSubmit}>
                   <Grid container spacing={8}>
                     <Grid item xs={12} sm={6}>
-                      <Field name="homeAddress">
-                        {({ input, meta }) => {
-                          return (
-                            <AddressAutocomplete
-                              onChange={input.onChange}
-                              // value={input.value}
-                              label="Home Address"
-                              addressInfo={addressInfo}
-                            />
-                          )
-                        }}
-                      </Field>
+                      <AddressAutocomplete
+                        name="homeAddress.street"
+                        label="Home Address"
+                        change={form.change}
+                        initAddress={initialValues.homeAddress.street}
+                      />
                     </Grid>
                     <Grid item xs={12} sm={6}>
                       <TextInput
@@ -67,11 +74,13 @@ function UserAddressForm({ trav }) {
                       />
                     </Grid>
 
-                    <Grid item xs={12} sm={6}>
-                      {showMe(values, "VALUES")}
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <Button onClick={handleSubmit} variant="contained">
+                    <Grid item xs={12} style={{ textAlign: "right" }}>
+                      <Button
+                        disabled={pristine}
+                        color={dirty ? "primary" : "default"}
+                        onClick={handleSubmit}
+                        variant="contained"
+                      >
                         SAVE
                       </Button>
                     </Grid>

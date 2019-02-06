@@ -1,13 +1,6 @@
 import gql from "graphql-tag"
 
-const locationInfoFragment = gql`
-  fragment LocationInfo on Location {
-    lat
-    lng
-    name
-    airportCode
-  }
-`
+import { LocationInfoFrag } from "../user.queries"
 
 const ridesInfoFragment = gql`
   fragment RidesInfo on Ride {
@@ -26,7 +19,7 @@ const ridesInfoFragment = gql`
       ...LocationInfo
     }
   }
-  ${locationInfoFragment}
+  ${LocationInfoFrag}
 `
 
 export const flightSearchQ = gql`
@@ -48,7 +41,7 @@ export const flightSearchQ = gql`
       }
     }
   }
-  ${locationInfoFragment}
+  ${LocationInfoFrag}
   ${ridesInfoFragment}
 `
 
@@ -72,7 +65,7 @@ export function flightSearchQConstructor({ searchAlias, inputName }) {
       }
     }
   }
-  ${locationInfoFragment}
+  ${LocationInfoFrag}
   ${ridesInfoFragment}
 `
 }
