@@ -7,46 +7,28 @@ import {
   Avatar,
   Divider
 } from "@material-ui/core"
-import { Mutation } from "react-apollo"
-import gql from "graphql-tag"
+import { Mutation, Query } from "react-apollo"
+import { ADD_TRAVELER_MUT } from "local../../queries/local.queries"
 
-const ADD_TRAVELER_MUT = gql`
-  mutation addTraveler($userId: ID!, $airportCode: String) {
-    addTraveler(userId: $userId, airportCode: $airportCode) @client
-  }
-`
-
-function TravelerPicker({
-  travelers,
-  onClose,
-  addTraveler,
-  anchorEl,
-  addedTravs,
-  adminLocs
-}) {
+function TravelerPicker({ travelers, onClose, anchorEl, dontShowThese = [] }) {
   if (!travelers) return null
   return (
     <Menu onClose={onClose} anchorEl={anchorEl} open={!!anchorEl}>
       {travelers
-        // only show travelers who arent already in the list
-        .filter(trav => !addedTravs[trav.id])
+        .filter(trav => !dontShowThese.includes(trav.id))
         .map(trav => {
           const fullName = `${trav.firstName} ${trav.lastName}`
           const airportCode =
-            trav.homeAirports && trav.homeAirports.length
-              ? trav.homeAirports[0].airportCode
+            trav.freqAirports && trav.freqAirports.length
+              ? trav.freqAirports[0].location.airportCode
               : ""
-          const homeAirport =
-            trav.homeAirports && trav.homeAirports.length
-              ? trav.homeAirports[0]
-              : {}
           return (
             <Mutation key={trav.id} mutation={ADD_TRAVELER_MUT}>
               {addTravelerApollo => {
                 return (
                   <MenuItem
                     onClick={() => {
-                      addTraveler({ userId: trav.id, airportCode })
+                      // addTraveler({ userId: trav.id, airportCode })
                       addTravelerApollo({
                         variables: {
                           userId: trav.id,

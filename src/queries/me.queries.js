@@ -1,5 +1,5 @@
 import gql from "graphql-tag"
-import { AddressInfoFrag, UserInfoFrag } from "./user.queries"
+import { AddressInfoFrag, UserInfoFrag, AdminLocInfoFrag } from "./user.queries"
 export const signInQ = `
   query SIGN_IN($email: String!, $password: String!) {
     signIn(email: $email, password: $password) {
@@ -12,17 +12,11 @@ export const myLocsQ = gql`
   query MY_LOCS {
     me {
       adminLocs(limit: 30) {
-        id
-        notes
-        location {
-          name
-          airportCode
-          lat
-          lng
-        }
+        ...AdminLocInfo
       }
     }
   }
+  ${AdminLocInfoFrag}
 `
 
 export const myTravelersQ = gql`
@@ -32,22 +26,24 @@ export const myTravelersQ = gql`
         firstName
         lastName
         id
-        homeAirports {
-          airportCode
-          name
-          lat
-          lng
+        freqAirports {
+          ...AdminLocInfo
         }
         photoUrl
         userName
       }
     }
+    travelersOrigins @client {
+      userId
+      origin
+    }
   }
+  ${AdminLocInfoFrag}
 `
 
 export const MyTravelersIds = gql`
   query MY_TRAVELERS_IDS {
-    myTravelerIds: me {
+    myTravelersIds: me {
       adminTravelers {
         id
       }

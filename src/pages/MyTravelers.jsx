@@ -18,17 +18,19 @@ function MyTravelers() {
           console.log("error is", error.graphQLErrors)
           return "error. . ."
         }
-        // const travelers = data && data.me && data.me.adminTravelers
-        console.log("MyTravelers data", data)
+        const { adminTravelers } = data.myTravelersIds
         return (
           <Grid container spacing={16}>
-            {data.myTravelerIds.adminTravelers.map(trav => {
+            {adminTravelers.map(trav => {
               return (
                 <Grid key={trav.id} item xs={12} md={6}>
                   <UserCard userId={trav.id} />
                 </Grid>
               )
             })}
+            <Grid item xs={12} md={6}>
+              <UserCard />
+            </Grid>
           </Grid>
         )
       }}

@@ -3,7 +3,8 @@ import { Query } from "react-apollo"
 import gql from "graphql-tag"
 import { showMe } from "../helpers/showMe"
 import { Button } from "@material-ui/core"
-
+import { UserInfoFrag } from "../queries/user.queries"
+import { TRAVELERS_ORIGINS } from "../queries/flights/flightSearch.query"
 export const AIRPORT_COORDINATES = gql`
   {
     commonAirport @client {
@@ -25,15 +26,10 @@ export const TRAVELERS_QUERY = gql`
 export const TRAVELERS_INFO = gql`
   query TRAVELERS_INFO($userIds: [ID!]) {
     users(userIds: $userIds) {
-      firstName
-      lastName
-      email
-      homeAirports {
-        name
-      }
-      id
+      ...UserInfo
     }
   }
+  ${UserInfoFrag}
 `
 
 // get back my 'adminLoc' version of this airport.  with notes, etc.
@@ -48,8 +44,6 @@ function MapDisplay() {
     <>
       <Query query={AIRPORT_COORDINATES}>
         {({ loading, error, data }) => {
-          console.log("data in map", data)
-
           return (
             <div>
               map display
@@ -58,9 +52,8 @@ function MapDisplay() {
           )
         }}
       </Query>
-      <Query query={TRAVELERS_QUERY}>
+      <Query query={TRAVELERS_ORIGINS}>
         {({ loading, error, data }) => {
-          console.log("map2", data)
           const { travelers = [] } = data
           return (
             <div>
@@ -76,7 +69,7 @@ function MapDisplay() {
                   return (
                     <div>
                       more user info
-                      {showMe(TravData)}
+                      {showMe(data, "travelersOrigins")}
                     </div>
                   )
                 }}

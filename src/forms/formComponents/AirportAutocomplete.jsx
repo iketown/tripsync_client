@@ -12,7 +12,12 @@ import {
 import Autocomplete from "react-autocomplete"
 import { AddCircleOutline } from "@material-ui/icons"
 //
-function AirportAutocomplete({ label, handleSelectedAirport }) {
+function AirportAutocomplete({
+  label,
+  handleSelectedAirport,
+  autoFocus,
+  skipConfirmationButton
+}) {
   const [searchText, setSearchText] = useState("")
   const [chosenAirport, setChosenAirport] = useState({})
   const limit = 10
@@ -69,13 +74,14 @@ function AirportAutocomplete({ label, handleSelectedAirport }) {
               }}
               onSelect={(val, item) => {
                 setChosenAirport(item)
-                // handleSelectedAirport(item)
                 setSearchText(val)
+                skipConfirmationButton && handleSelectedAirport(item)
               }}
               renderInput={props => {
                 const { ref, foo, ...rest } = props
                 return (
                   <TextField
+                    autoFocus={autoFocus}
                     label={label}
                     {...rest}
                     inputRef={ref}

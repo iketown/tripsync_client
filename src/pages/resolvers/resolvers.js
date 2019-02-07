@@ -1,5 +1,10 @@
 import { TRAVELERS_QUERY } from "../../components/MapDisplay.jsx"
+import { TRAVELERS_ORIGINS } from "../../queries/local.queries"
 import { myTravelersQ } from "../../queries/me.queries"
+
+//
+//
+
 export const resolvers = {
   Mutation: {
     setCommonAirport: (_, { commonAirport }, { cache, getCacheKey }) => {
@@ -10,45 +15,46 @@ export const resolvers = {
     },
     addTraveler: async (_, { userId, airportCode }, { cache }) => {
       try {
-        const { travelers } = await cache.readQuery({ query: TRAVELERS_QUERY })
-        const newTravelers = [
-          ...travelers,
-          {
-            __typename: "Traveler",
-            userId,
-            airportCode
-          }
-        ]
-        await cache.writeQuery({
-          query: TRAVELERS_QUERY,
-          data: { travelers: newTravelers }
+        const data = await cache.readQuery({ query: TRAVELERS_ORIGINS })
+        console.log("data in resolver", data.travelersOrigins)
+        data.travelersOrigins.push({
+          __typename: "travelersOrigins",
+          userId,
+          origin: airportCode
         })
-        return true
+        cache.writeQuery({ query: TRAVELERS_ORIGINS, data })
       } catch (error) {
+        console.error("error in addTraveler resolver", error)
         return false
       }
     },
     removeTraveler: async (_, { userId }, { cache }) => {
-      const { travelers } = await cache.readQuery({ query: TRAVELERS_QUERY })
-      const newTravelers = travelers.filter(t => t.userId !== userId)
-      await cache.writeQuery({
-        query: TRAVELERS_QUERY,
-        data: { travelers: newTravelers }
+      const data = await cache.readQuery({ query: TRAVELERS_ORIGINS })
+      const newTravOrigins = data.travelersOrigins.filter(
+        travOrig => travOrig.userId !== userId
+      )
+      data.travelersOrigins = newTravOrigins
+      cache.writeQuery({
+        query: TRAVELERS_ORIGINS,
+        data
       })
+      return { userId }
     },
-    updateTraveler: async (_, { userId, update }, { cache }) => {
-      const { travelers } = await cache.readQuery({ query: TRAVELERS_QUERY })
-      const thisTravOld = travelers.find(trav => trav.userId === userId)
-      const thisTravNew = { ...thisTravOld, ...update }
-      const newTravelers = travelers.map(trav => {
-        if (trav.userId === userId) return thisTravNew
-        return trav
+    updateTravelerOrigin: async (_, { userId, airportCode }, { cache }) => {
+      const data = await cache.readQuery({
+        query: TRAVELERS_ORIGINS
       })
-      await cache.writeQuery({
-        query: TRAVELERS_QUERY,
-        data: { travelers: newTravelers }
+      const newTravOrigins = data.travelersOrigins.map(travOrig => {
+        if (travOrig.userId === userId)
+          return { ...travOrig, origin: airportCode }
+        return travOrig
       })
-      return thisTravNew
+      data.travelersOrigins = newTravOrigins
+      cache.writeQuery({
+        query: TRAVELERS_ORIGINS,
+        data
+      })
+      return { userId, origin: airportCode }
     }
   },
   Query: {

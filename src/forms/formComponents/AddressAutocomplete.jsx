@@ -8,7 +8,9 @@ import { Field } from "react-final-form"
 
 class LocationSearchInput extends Component {
   state = {
-    address: ""
+    address: "",
+    // to solve the autocomplete address label bug
+    focus: false
   }
   componentDidMount() {
     const address = this.props.initAddress
@@ -28,7 +30,6 @@ class LocationSearchInput extends Component {
       console.error(error)
     }
   }
-
   render() {
     const { label, value, name } = this.props
     return (
@@ -49,6 +50,8 @@ class LocationSearchInput extends Component {
                 return (
                   <div>
                     <TextField
+                      onFocus={() => this.setState({ focus: true })}
+                      onBlur={() => this.setState({ focus: false })}
                       label={label}
                       placeholder="enter address . . ."
                       inputProps={{
@@ -56,7 +59,9 @@ class LocationSearchInput extends Component {
                           className: "location-search-input"
                         })
                       }}
-                      InputLabelProps={{ shrink: !!this.state.address }}
+                      InputLabelProps={{
+                        shrink: !!this.state.address || this.state.focus
+                      }}
                     />
                     <div className="autocomplete-dropdown-container">
                       {loading && <div>Loading...</div>}

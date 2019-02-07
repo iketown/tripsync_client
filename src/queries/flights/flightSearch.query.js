@@ -2,6 +2,15 @@ import gql from "graphql-tag"
 
 import { LocationInfoFrag } from "../user.queries"
 
+export const TRAVELERS_ORIGINS = gql`
+  query TRAVELERS_ORIGINS {
+    travelersOrigins @client {
+      userId
+      origin
+    }
+  }
+`
+
 const ridesInfoFragment = gql`
   fragment RidesInfo on Ride {
     name

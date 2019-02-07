@@ -65,6 +65,7 @@ export const UserInfoFrag = gql`
     }
   }
   ${LocationInfoFrag}
+  ${AddressInfoFrag}
 `
 
 export const FullUserInfoQuery = gql`
@@ -73,7 +74,6 @@ export const FullUserInfoQuery = gql`
       ...UserInfo
     }
   }
-  ${AddressInfoFrag}
   ${UserInfoFrag}
 `
 
@@ -91,7 +91,27 @@ export const UpdateUserMutation = gql`
       ...UserInfo
     }
   }
-  ${AddressInfoFrag}
+  ${UserInfoFrag}
+`
+
+export const DeleteUserMutation = gql`
+  mutation DELETE_USER($userId: ID!) {
+    deleteUser(userId: $userId)
+  }
+`
+
+export const CreateTravelerMutation = gql`
+  mutation CREATE_TRAVELER(
+    $input: UserInput!
+    $homeAddressInput: HomeAddressInput
+  ) {
+    newTraveler: createTraveler(
+      input: $input
+      homeAddressInput: $homeAddressInput
+    ) {
+      ...UserInfo
+    }
+  }
   ${UserInfoFrag}
 `
 
@@ -131,3 +151,21 @@ export const RemoveFreqAirport = gql`
     removeFreqAirport(userId: $userId, adminLocId: $adminLocId)
   }
 `
+
+// this is to show the pattern and what is needed to change a fragment
+let client = {}
+function jackUpFrag() {
+  const data = client.readFragment({
+    id: "AdminLoc:5c5ad56aac3ab378dc81e8e6",
+    fragment: AdminLocInfoFrag,
+    fragmentName: "AdminLocInfo"
+  })
+  console.log("data frag", data)
+  data.location.airportCode = "HAHAHAHAHA fuckers!!"
+  client.writeFragment({
+    id: "AdminLoc:5c5ad56aac3ab378dc81e8e6",
+    fragment: AdminLocInfoFrag,
+    fragmentName: "AdminLocInfo",
+    data
+  })
+}
