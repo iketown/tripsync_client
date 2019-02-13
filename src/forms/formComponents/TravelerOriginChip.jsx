@@ -16,6 +16,8 @@ import {
   Button,
   Grid
 } from "@material-ui/core"
+import LineTo from "react-lineto"
+
 import { Person } from "@material-ui/icons"
 import { withStyles } from "@material-ui/core/styles"
 import { showMe } from "../../helpers/showMe"
@@ -25,20 +27,25 @@ import { shorten } from "../../helpers/utils"
 //
 //
 
-function TravelerOriginChip({ userId, origin, smart }) {
+function TravelerOriginChip({ userId, origin, smart, first }) {
   const [anchorEl, setAnchorEl] = useState(null)
   const [airportACBoxOpen, setAirportACBoxOpen] = useState(false)
 
   return (
-    <Query query={FullUserInfoQuery} variables={{ userId }}>
-      {({ loading, error, data: { fullUserInfo }, client }) => {
-        if (loading) return "loading. . ."
+    <Query query={FullUserInfoQuery} variables={{ id: userId }}>
+      {({ loading, error, data, client }) => {
+        if (loading) return <Chip label="loading" />
         if (error) return "OriginChip error. . ."
-        const { firstName, lastName, photoUrl, freqAirports } = fullUserInfo
+        const {
+          firstName,
+          lastName,
+          photoUrl,
+          freqAirports
+        } = data.fullUserInfo
 
         return (
           <>
-            <Mutation mutation={REMOVE_TRAVELER_MUT} variables={{ userId }}>
+            <Mutation mutation={REMOVE_TRAVELER_MUT} variables={{ id: userId }}>
               {removeTraveler => {
                 const otherProps = smart
                   ? {
@@ -51,7 +58,8 @@ function TravelerOriginChip({ userId, origin, smart }) {
                   : {}
                 return (
                   <Chip
-                    style={{ marginLeft: "10px" }}
+                    className={userId + "lineStart"}
+                    style={{ marginTop: first ? "0" : "5px" }}
                     avatar={
                       photoUrl ? (
                         <Avatar
@@ -81,14 +89,21 @@ function TravelerOriginChip({ userId, origin, smart }) {
                 )
               }}
             </Mutation>
-
+            {/* <LineTo
+              from={userId + "lineStart"}
+              fromAnchor={"right"}
+              to="destinationAirport"
+              toAnchor={"left"}
+              delay
+            /> */}
             {/* 🛩️ 🛩️ 🛩️ popup menu to change airports 🛩️ 🛩️ 🛩️ */}
             <Mutation mutation={UPDATE_TRAVELER_ORIGIN}>
               {(updateTravelerOrigin, { data }) => {
                 async function handleSubmitAirport(airportCode) {
-                  console.log("calling updateTravOr", userId, airportCode)
+                  const variables = { id: userId, airportCode }
+                  console.log("variables in handleSubmitAirport", variables)
                   updateTravelerOrigin({
-                    variables: { userId, airportCode }
+                    variables
                   })
                   setAnchorEl(null)
                 }
@@ -97,6 +112,7 @@ function TravelerOriginChip({ userId, origin, smart }) {
                     <AirportAutocompleteDialogBox
                       open={airportACBoxOpen}
                       setAirportACBoxOpen={setAirportACBoxOpen}
+                      handleSubmitAirport={handleSubmitAirport}
                       {...{ firstName, lastName, userId }}
                     />
                     <Menu
@@ -107,9 +123,6 @@ function TravelerOriginChip({ userId, origin, smart }) {
                       <MenuItem onClick={() => setAirportACBoxOpen(true)}>
                         Other Airport
                       </MenuItem>
-                      <MenuItem>
-                        <AirportAutocomplete />
-                      </MenuItem>
                       {freqAirports &&
                         freqAirports.map(adminLoc => {
                           const { airportCode, name } = adminLoc.location
@@ -117,10 +130,6 @@ function TravelerOriginChip({ userId, origin, smart }) {
                             <MenuItem
                               key={airportCode + "freqAirports"}
                               onClick={() => {
-                                console.log(
-                                  "calling handleSubmitAp",
-                                  airportCode
-                                )
                                 handleSubmitAirport(airportCode)
                               }}
                             >
@@ -132,32 +141,6 @@ function TravelerOriginChip({ userId, origin, smart }) {
                           )
                         })}
                       {freqAirports.length && <Divider />}
-
-                      {/* {adminLocs
-                // filter out airports that have already been listed in my 'home airports'
-                .filter(
-                  loc =>
-                    !freqAirports.find(
-                      homeAP => homeAP.airportCode === loc.location.airportCode
-                    )
-                )
-                .map(adminLoc => {
-                  const { location } = adminLoc
-                  const { airportCode, name } = location
-                  return (
-                    <MenuItem
-                      key={adminLoc.id}
-                      onClick={() => {
-                        handleSubmitAirport(airportCode)
-                      }}
-                    >
-                      <ListItemText
-                        primary={airportCode}
-                        secondary={shorten(name)}
-                      />
-                    </MenuItem>
-                  )
-                })} */}
                     </Menu>
                   </>
                 )

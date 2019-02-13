@@ -4,6 +4,7 @@ import * as serviceWorker from "./serviceWorker"
 import App from "./pages/App"
 import ApolloClient from "apollo-boost"
 import { ApolloProvider } from "react-apollo"
+import { ApolloProvider as ApolloHooksProvider } from "react-apollo-hooks"
 import { MuiPickersUtilsProvider } from "material-ui-pickers"
 import { MuiThemeProvider } from "@material-ui/core"
 import { MuiTheme } from "./paperbase/paperbaseTheme"
@@ -29,11 +30,13 @@ const client = new ApolloClient({
 
 const TripSyncApp = () => (
   <ApolloProvider client={client}>
-    <MuiThemeProvider theme={MuiTheme}>
-      <MuiPickersUtilsProvider utils={DateFnsUtils}>
-        <App />
-      </MuiPickersUtilsProvider>
-    </MuiThemeProvider>
+    <ApolloHooksProvider client={client}>
+      <MuiThemeProvider theme={MuiTheme}>
+        <MuiPickersUtilsProvider utils={DateFnsUtils}>
+          <App />
+        </MuiPickersUtilsProvider>
+      </MuiThemeProvider>
+    </ApolloHooksProvider>
   </ApolloProvider>
 )
 

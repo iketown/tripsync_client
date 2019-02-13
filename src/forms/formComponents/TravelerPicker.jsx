@@ -31,7 +31,7 @@ function TravelerPicker({ travelers, onClose, anchorEl, dontShowThese = [] }) {
                       // addTraveler({ userId: trav.id, airportCode })
                       addTravelerApollo({
                         variables: {
-                          userId: trav.id,
+                          id: trav.id,
                           airportCode
                         }
                       })

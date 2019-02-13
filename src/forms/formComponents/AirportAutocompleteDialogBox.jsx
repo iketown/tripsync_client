@@ -1,4 +1,5 @@
 import React, { useState } from "react"
+import { Mutation } from "react-apollo"
 import Button from "@material-ui/core/Button"
 import TextField from "@material-ui/core/TextField"
 import Dialog from "@material-ui/core/Dialog"
@@ -8,7 +9,8 @@ import DialogContentText from "@material-ui/core/DialogContentText"
 import DialogTitle from "@material-ui/core/DialogTitle"
 import { FormControlLabel, Checkbox } from "@material-ui/core"
 import AirportAutocomplete from "./AirportAutocomplete.jsx"
-
+import { AddFreqAirport, UserInfoFrag } from "../../queries/user.queries.js"
+import { userUpdateFragmentInfo } from "../../queries/query.helpers/userUpdate"
 //
 //
 function AirportAutocompleteDialogBox({
@@ -16,14 +18,14 @@ function AirportAutocompleteDialogBox({
   setAirportACBoxOpen,
   firstName,
   lastName,
-  userId
+  userId,
+  handleSubmitAirport
 }) {
   function handleClose() {
     setAirportACBoxOpen(false)
   }
   function handleSelectedAirport(ap) {
     setSelectedAirport(ap)
-    console.log("selected ap", ap)
   }
   function handleCheckBox(e) {
     setAddToList(e.target.checked)
@@ -72,22 +74,40 @@ function AirportAutocompleteDialogBox({
               } to ${firstName}'s airports`}
             />
           )}
-          {/* <Mutation variables={}>
-            {confirmAirport => {
-  function handleConfirmButton(){
-    if(addToList) confirmAirport()
-  }
-          return <Button
-            disabled={!selectedAirport.airportCode}
-            onClick={handleConfirmButton}
-            color="primary"
-            variant={selectedAirport.airportCode && "contained"}
-          >
-            Select
-            {selectedAirport.airportCode && ` ${selectedAirport.airportCode}`}
-          </Button>
+          <Mutation
+            mutation={AddFreqAirport}
+            variables={{ userId, airportCode: selectedAirport.airportCode }}
+            update={(proxy, { data }) => {
+              const readData = proxy.readFragment(
+                userUpdateFragmentInfo(userId)
+              )
+              readData.freqAirports.push(data.newFreqAirport)
+              proxy.writeFragment({
+                ...userUpdateFragmentInfo(userId),
+                data: readData
+              })
             }}
-          </Mutation> */}
+          >
+            {addAirportToUserList => {
+              function handleConfirmButton() {
+                if (addToList) addAirportToUserList()
+                handleSubmitAirport(selectedAirport.airportCode)
+                handleClose()
+              }
+              return (
+                <Button
+                  disabled={!selectedAirport.airportCode}
+                  onClick={handleConfirmButton}
+                  color="primary"
+                  variant={selectedAirport.airportCode && "contained"}
+                >
+                  Select
+                  {selectedAirport.airportCode &&
+                    ` ${selectedAirport.airportCode}`}
+                </Button>
+              )
+            }}
+          </Mutation>
         </div>
       </DialogActions>
     </Dialog>

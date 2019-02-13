@@ -34,7 +34,7 @@ export const myTravelersQ = gql`
       }
     }
     travelersOrigins @client {
-      userId
+      id
       origin
     }
   }

@@ -5,6 +5,7 @@ import { showMe } from "../helpers/showMe"
 import { Button } from "@material-ui/core"
 import { UserInfoFrag } from "../queries/user.queries"
 import { TRAVELERS_ORIGINS } from "../queries/flights/flightSearch.query"
+
 export const AIRPORT_COORDINATES = gql`
   {
     commonAirport @client {
@@ -14,30 +15,6 @@ export const AIRPORT_COORDINATES = gql`
     }
   }
 `
-
-export const TRAVELERS_QUERY = gql`
-  {
-    travelers @client {
-      userId
-      airportCode
-    }
-  }
-`
-export const TRAVELERS_INFO = gql`
-  query TRAVELERS_INFO($userIds: [ID!]) {
-    users(userIds: $userIds) {
-      ...UserInfo
-    }
-  }
-  ${UserInfoFrag}
-`
-
-// get back my 'adminLoc' version of this airport.  with notes, etc.
-// export const FULL_AIRPORT_QUERY = gql`
-//     {
-
-//     }
-// `
 
 function MapDisplay() {
   return (
@@ -52,7 +29,7 @@ function MapDisplay() {
           )
         }}
       </Query>
-      <Query query={TRAVELERS_ORIGINS}>
+      {/* <Query query={TRAVELERS_ORIGINS}>
         {({ loading, error, data }) => {
           const { travelers = [] } = data
           return (
@@ -77,7 +54,7 @@ function MapDisplay() {
             </div>
           )
         }}
-      </Query>
+      </Query> */}
     </>
   )
 }

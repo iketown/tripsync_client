@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useRef } from "react"
 import { Query } from "react-apollo"
 import { airportAutocompleteQ } from "../../queries/flights/airportAutocomplete.query"
 import {
@@ -14,6 +14,7 @@ import { AddCircleOutline } from "@material-ui/icons"
 //
 function AirportAutocomplete({
   label,
+  placeholder,
   handleSelectedAirport,
   autoFocus,
   skipConfirmationButton
@@ -93,19 +94,22 @@ function AirportAutocomplete({
                         .slice(0, 30)
                     }
                     InputProps={{
-                      endAdornment: chosenAirport && chosenAirport.airportCode && (
-                        <InputAdornment position="end">
-                          <IconButton
-                            onClick={() => {
-                              handleSelectedAirport(chosenAirport)
-                              setChosenAirport(null)
-                              setSearchText("")
-                            }}
-                          >
-                            <AddCircleOutline color="primary" />
-                          </IconButton>
-                        </InputAdornment>
-                      )
+                      endAdornment: !skipConfirmationButton &&
+                        chosenAirport &&
+                        chosenAirport.airportCode && (
+                          <InputAdornment position="end">
+                            <IconButton
+                              onClick={() => {
+                                handleSelectedAirport(chosenAirport)
+                                setChosenAirport(null)
+                                setSearchText("")
+                              }}
+                            >
+                              <AddCircleOutline color="primary" />
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      placeholder
                     }}
                   />
                 )

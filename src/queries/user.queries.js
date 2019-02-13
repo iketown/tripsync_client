@@ -69,8 +69,8 @@ export const UserInfoFrag = gql`
 `
 
 export const FullUserInfoQuery = gql`
-  query FULL_USER_INFO($userId: ID!) {
-    fullUserInfo: user(id: $userId) {
+  query FULL_USER_INFO($id: ID!) {
+    fullUserInfo: user(id: $id) {
       ...UserInfo
     }
   }

@@ -12,11 +12,8 @@ function AddRemoveTravelers() {
       {({ loading, error, data }) => {
         if (loading) return <span>loading . . .</span>
         if (error) return <span>AddRemoveTravelers error . . .</span>
-        console.log("data in AddRemoveTrav", data)
         const travelers = data.me.adminTravelers
-        const dontShowThese = data.travelersOrigins.map(
-          travOrig => travOrig.userId
-        )
+        const dontShowThese = data.travelersOrigins.map(travOrig => travOrig.id)
         return (
           <>
             <IconButton onClick={e => setAnchorEl(e.currentTarget)}>

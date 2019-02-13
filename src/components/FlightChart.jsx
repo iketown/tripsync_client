@@ -1,7 +1,7 @@
 import React, { Component } from "react"
 import moment from "moment"
 import { Bubble } from "react-chartjs-2"
-
+import jsonDataArr from "./dataArrFromSearch.json"
 import {
   red,
   purple,

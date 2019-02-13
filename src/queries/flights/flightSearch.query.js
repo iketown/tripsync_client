@@ -1,80 +1,39 @@
 import gql from "graphql-tag"
 
-import { LocationInfoFrag } from "../user.queries"
+import {
+  LocationInfoFrag,
+  RideInfoFrag,
+  BasicUserInfoFrag
+} from "../query.fragments"
 
 export const TRAVELERS_ORIGINS = gql`
   query TRAVELERS_ORIGINS {
     travelersOrigins @client {
-      userId
+      id
       origin
     }
   }
 `
 
-const ridesInfoFragment = gql`
-  fragment RidesInfo on Ride {
-    name
-    departureTime
-    arrivalTime
-    duration
-    company {
-      name
-      iata
-    }
-    origin {
-      ...LocationInfo
-    }
-    destination {
-      ...LocationInfo
-    }
-  }
-  ${LocationInfoFrag}
-`
-
-export const flightSearchQ = gql`
-  query FLIGHT_SEARCH($input: FlightSearchInput!) {
-    flightSearch(input: $input) {
-      amadeusID
+export const FLIGHT_SEARCH_MUTATION = gql`
+  mutation FLIGHT_SEARCH($input: FlightSearchInput!) {
+    flightSearchResults: flightSearch(input: $input) {
+      amadeusId
       price
+      origin
+      destination
       travelers {
-        firstName
-        lastName
-        id
-        userName
+        ...BasicUserInfo
       }
       returnRides {
-        ...RidesInfo
+        ...RideInfo
       }
       rides {
-        ...RidesInfo
+        ...RideInfo
       }
     }
   }
   ${LocationInfoFrag}
-  ${ridesInfoFragment}
+  ${RideInfoFrag}
+  ${BasicUserInfoFrag}
 `
-
-export function flightSearchQConstructor({ searchAlias, inputName }) {
-  return `
-  query FLIGHT_SEARCH($${inputName}: FlightSearchInput!) {
-    ${searchAlias} : flightSearch(input: $${inputName}) {
-      amadeusID
-      price
-      travelers {
-        firstName
-        lastName
-        id
-        userName
-      }
-      returnRides {
-        ...RidesInfo
-      }
-      rides {
-        ...RidesInfo
-      }
-    }
-  }
-  ${LocationInfoFrag}
-  ${ridesInfoFragment}
-`
-}

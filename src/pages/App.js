@@ -8,8 +8,10 @@ import Flights from "./Flights.jsx"
 import TestCalls from "./TestCalls"
 import Home from "./index"
 import Tests2 from "./Tests2"
+import Tests4 from "./Tests4"
 import MyTravelers from "./MyTravelers"
-
+import FlightChart2 from "../components/FlightChart2"
+import FlightSearchResults from "../components/FlightSearchResults.jsx"
 const Container = styled.div`
   margin: 8px;
   ${p =>
@@ -38,7 +40,13 @@ export class App extends Component {
           <Container showGrid={this.state.showGrid}>
             <Route path="/amadeus" component={TestCalls} />
             <Route path="/test2" component={Tests2} />
+            <Route path="/Tests4" component={Tests4} />
             <Route path="/flights" component={Flights} />
+            <Route
+              path="/flightSearchResults"
+              component={FlightSearchResults}
+            />
+            <Route path="/chart" component={FlightChart2} />
             <Route path="/travelers" component={MyTravelers} />
             <Route path="/" exact component={Home} />
           </Container>

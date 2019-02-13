@@ -1,112 +1,172 @@
-import React, { Component } from "react"
+import React from "react"
 import { Form, Field } from "react-final-form"
-import { Grid, Button, TextField } from "@material-ui/core"
-import { InlineDatePicker } from "material-ui-pickers"
+import {
+  Grid,
+  Typography,
+  FormControlLabel,
+  Button,
+  Switch
+} from "@material-ui/core"
 import { showMe } from "../helpers/showMe"
 import addDays from "date-fns/addDays"
-import { ApolloConsumer, Mutation } from "react-apollo"
-import gql from "graphql-tag"
+import { ApolloConsumer, Mutation, Query } from "react-apollo"
+import styled from "styled-components"
 //
 import DatePicker from "./formComponents/DatePicker.jsx"
-import ReturnTripRadio from "./formComponents/ReturnTripRadio"
 import AddRemoveTravelers from "./formComponents/AddRemoveTravelers"
 import TravelersOriginList from "./formComponents/TravelersOriginList.jsx"
-import DestinationPicker from "./formComponents/DestinationPicker"
-import { ArcherContainer, ArcherElement } from "react-archer"
 import AirportAutocomplete from "./formComponents/AirportAutocomplete.jsx"
 //
+
+const CenteredElements = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /* border: 1px orange dotted; */
+  height: 100%;
+`
+
 const initialValues = {
   departDate: addDays(new Date(), 7),
   returnDate: addDays(new Date(), 14),
-  oneWay: "oneWay"
+  roundTrip: false
 }
 
-export class FlightSearchForm extends Component {
-  state = {
-    oneWayBool: true,
-    travCount: 0,
-    sharedAirport: {}
-    // [each traveler id]: origin/dest airport
+export function FlightSearchForm({ handleSearchFlights }) {
+  const handleSubmit = values => {
+    handleSearchFlights(values)
   }
-  handleSubmit = values => {
-    console.log("values", values)
-  }
-  changeOneWay = bool => {
-    this.setState({ oneWayBool: bool })
-  }
-  addTraveler = ({ userId, airport }) => {
-    // console.log("adding", userId, airport)
-    // this.setState({
-    //   [userId]: airport || true,
-    //   travCount: this.state.travCount + 1
-    // })
-  }
-  setAirport = ({ userId, airportCode }) => {
-    this.setState({ [userId]: airportCode })
-  }
-  render() {
-    return (
-      <Form onSubmit={this.handleSubmit} initialValues={initialValues}>
-        {({ values, handleSubmit }) => {
-          const { travCount, oneWayBool, ...travelers } = this.state
-          return (
-            <form onSubmit={handleSubmit}>
-              <Grid container spacing={8}>
-                <Grid item xs={12} container spacing={16}>
-                  <Grid item>
-                    <DatePicker name="departDate" label="Departure Date" />
-                  </Grid>
-                  {!this.state.oneWayBool && (
-                    <Grid item>
-                      <DatePicker name="returnDate" label="Return Date" />
-                    </Grid>
-                  )}
-                  <Grid item>
-                    <ReturnTripRadio changeOneWay={this.changeOneWay} />
-                  </Grid>
+
+  return (
+    <Form onSubmit={handleSubmit} initialValues={initialValues}>
+      {({ form, values, handleSubmit }) => {
+        const { roundTrip } = values
+        const columnObjs = [
+          {
+            title: "Travelers",
+            columnComponent: <AddRemoveTravelers />
+          },
+          { title: "Destination", columnComponent: null },
+          {
+            title: "Dates",
+            columnComponent: (
+              <Field
+                type="checkbox"
+                name="roundTrip"
+                render={({ input, meta }) => {
+                  return (
+                    <FormControlLabel
+                      label={roundTrip ? "Round Trip" : "One Way"}
+                      labelPlacement="start"
+                      control={
+                        <Switch
+                          // checked={!oneWayBool}
+                          // onChange={e => this.changeOneWay(!e.target.checked)}
+                          {...input}
+                          color="primary"
+                        />
+                      }
+                    />
+                  )
+                }}
+              />
+            )
+          }
+        ]
+        return (
+          <form onSubmit={handleSubmit}>
+            <Grid container spacing={16}>
+              {columnObjs.map(({ title, columnComponent }) => (
+                <Grid
+                  key={title}
+                  item
+                  xs={6}
+                  sm={4}
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center"
+                  }}
+                >
+                  <Typography component="h4">{title}</Typography>
+                  {columnComponent}
                 </Grid>
-                <Grid container item xs={12}>
+              ))}
+            </Grid>
+            <Grid container spacing={16}>
+              <Grid item xs={6} sm={4} style={{ textAlign: "center" }}>
+                <CenteredElements>
                   <TravelersOriginList smart />
-                  <AddRemoveTravelers
-                    addTraveler={this.addTraveler}
-                    addedTravs={this.state}
-                  />
-                </Grid>
-                <Grid item xs={12} style={{ padding: "1rem" }}>
+                </CenteredElements>
+              </Grid>
+              <Grid item xs={6} sm={4}>
+                <CenteredElements>
                   <ApolloConsumer>
                     {client => {
                       return (
-                        <AirportAutocomplete
-                          handleSelectedAirport={commonAirport => {
-                            client.writeData({
-                              data: {
-                                commonAirport
-                              }
-                            })
+                        <div
+                          className="destinationAirport"
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center"
                           }}
-                        />
+                        >
+                          <AirportAutocomplete
+                            placeholder="Enter Airport"
+                            skipConfirmationButton
+                            handleSelectedAirport={commonAirport => {
+                              form.change(
+                                "commonAirport",
+                                commonAirport.airportCode
+                              )
+                              client.writeData({
+                                data: {
+                                  commonAirport
+                                }
+                              })
+                            }}
+                          />
+                        </div>
                       )
                     }}
                   </ApolloConsumer>
-                </Grid>
-                {!this.state.oneWayBool && (
-                  <Grid item xs={12}>
-                    <TravelersOriginList />
-                  </Grid>
-                )}
-                <Grid item xs={12}>
-                  action buttons "search"
-                </Grid>
-                <Grid item xs={12}>
-                  {showMe(values)}
-                </Grid>
+                </CenteredElements>
               </Grid>
-            </form>
-          )
-        }}
-      </Form>
-    )
-  }
+              <Grid item xs={6} sm={4}>
+                <CenteredElements>
+                  <DatePicker name="departDate" label="Departure Date" />
+                  {roundTrip && (
+                    <DatePicker name="returnDate" label="Return Date" />
+                  )}
+                </CenteredElements>
+              </Grid>
+            </Grid>
+            <Grid container spacing={16}>
+              <Grid item xs={6} sm={4} style={{ textAlign: "center" }}>
+                <AddRemoveTravelers />
+              </Grid>
+              {/* two empty columns here */}
+            </Grid>
+
+            <Grid
+              variant={"contained"}
+              color="primary"
+              item
+              xs={12}
+              style={{ textAlign: "center" }}
+            >
+              <Button onClick={handleSubmit}>Search</Button>
+            </Grid>
+            <Grid item xs={12}>
+              {showMe(values)}
+            </Grid>
+          </form>
+        )
+      }}
+    </Form>
+  )
 }
 
 export default FlightSearchForm
